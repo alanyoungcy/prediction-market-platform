@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { TonConnectButton } from '@tonconnect/ui-react';
 import { Home, TrendingUp, User } from 'lucide-react';
 import Link from 'next/link';
+import CustomTonConnectButton from './CustomTonConnectButton';
 
 export default function Header() {
   return (
@@ -28,7 +28,7 @@ export default function Header() {
           </Link>
         </nav>
       </div>
-      <TonConnectButton />
+      <CustomTonConnectButton />
     </header>
   );
 }

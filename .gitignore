@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# TON Connect manifests
+public/tonconnect-manifest.json
+public/.well-known/tonconnect-manifest.json
