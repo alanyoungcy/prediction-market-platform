@@ -1,10 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '../../components/Header';
 import { ArrowLeft, Calendar, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useWalletData } from '../../hooks/useWalletData';
+import { useMarkets } from '../../contexts/MarketContext';
+import { createMarketTransaction } from '../../utils/ton';
 
 const CATEGORIES = [
   'Cryptocurrency',
@@ -18,7 +21,10 @@ const CATEGORIES = [
 ];
 
 export default function CreateMarketPage() {
+  const router = useRouter();
   const { isConnected, address } = useWalletData();
+  const { addMarket } = useMarkets();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -32,10 +38,46 @@ export default function CreateMarketPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Market creation will be implemented with TON blockchain');
-    console.log(formData);
+    
+    if (!isConnected || !address) {
+      alert('Please connect your wallet first');
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      const transaction = createMarketTransaction(
+        formData.title,
+        formData.description,
+        formData.category,
+        new Date(formData.endDate).getTime(),
+        formData.initialLiquidity
+      );
+      
+      console.log('Transaction created:', transaction);
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      addMarket({
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        endDate: formData.endDate,
+        creator: address,
+      });
+      
+      alert('Market created successfully!');
+      
+      router.push('/markets');
+    } catch (error) {
+      console.error('Error creating market:', error);
+      alert('Failed to create market. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   if (!isConnected) {
@@ -165,9 +207,10 @@ export default function CreateMarketPage() {
             
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+              disabled={isSubmitting}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              Create Market
+              {isSubmitting ? 'Creating Market...' : 'Create Market'}
             </button>
           </form>
         </div>

@@ -1,35 +1,62 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '../../components/Header';
 import { ArrowLeft, Clock, DollarSign, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useWalletData } from '../../hooks/useWalletData';
-
-const MOCK_MARKET = {
-  id: '1',
-  title: 'Will Bitcoin exceed $100,000 by end of 2023?',
-  description: 'This market will resolve to YES if the price of Bitcoin exceeds $100,000 USD on any major exchange before the end of 2023. It will resolve to NO otherwise.',
-  category: 'Cryptocurrency',
-  endDate: '2023-12-31',
-  volume: 25000,
-  yesPrice: 0.65,
-  noPrice: 0.35,
-  liquidity: 50000,
-  creator: '0:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-  resolved: false,
-  outcome: null
-};
+import { useMarkets } from '../../contexts/MarketContext';
 
 export default function MarketDetailPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const { id } = params;
   const { isConnected } = useWalletData();
-  const [market] = useState(MOCK_MARKET);
+  const { getMarket, buyShares, sellShares, loading } = useMarkets();
+  
+  const market = getMarket(id);
   const [outcome, setOutcome] = useState<'yes' | 'no'>('yes');
   const [amount, setAmount] = useState('');
+  const [tradeType, setTradeType] = useState<'buy' | 'sell'>('buy');
   
-  const handleBuy = () => {
+  useEffect(() => {
+    if (!loading && !market) {
+      router.push('/markets');
+    }
+  }, [market, loading, router]);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <p className="text-gray-500">Loading market details...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+  
+  if (!market) {
+    return null; // Will redirect in useEffect
+  }
+  
+  const handleTrade = () => {
     if (!amount) return;
-    alert(`Buying ${amount} ${outcome.toUpperCase()} shares`);
+    
+    const amountValue = parseFloat(amount);
+    if (isNaN(amountValue) || amountValue <= 0) return;
+    
+    if (tradeType === 'buy') {
+      buyShares(id, outcome === 'yes', amountValue);
+      alert(`Buying ${amount} ${outcome.toUpperCase()} shares`);
+    } else {
+      sellShares(id, outcome === 'yes', amountValue);
+      alert(`Selling ${amount} ${outcome.toUpperCase()} shares`);
+    }
+    
+    setAmount('');
   };
   
   return (
@@ -108,6 +135,29 @@ export default function MarketDetailPage({ params }: { params: { id: string } })
                   <div className="flex space-x-4 mb-4">
                     <button
                       className={`flex-1 py-2 rounded-lg font-medium ${
+                        tradeType === 'buy' 
+                          ? 'bg-blue-600 text-white' 
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                      onClick={() => setTradeType('buy')}
+                    >
+                      Buy
+                    </button>
+                    <button
+                      className={`flex-1 py-2 rounded-lg font-medium ${
+                        tradeType === 'sell' 
+                          ? 'bg-blue-600 text-white' 
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                      onClick={() => setTradeType('sell')}
+                    >
+                      Sell
+                    </button>
+                  </div>
+                  
+                  <div className="flex space-x-4 mb-4">
+                    <button
+                      className={`flex-1 py-2 rounded-lg font-medium ${
                         outcome === 'yes' 
                           ? 'bg-green-600 text-white' 
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -143,11 +193,11 @@ export default function MarketDetailPage({ params }: { params: { id: string } })
                   </div>
                   
                   <button
-                    onClick={handleBuy}
+                    onClick={handleTrade}
                     disabled={!amount}
                     className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
-                    Buy {outcome.toUpperCase()} Shares
+                    {tradeType === 'buy' ? 'Buy' : 'Sell'} {outcome.toUpperCase()} Shares
                   </button>
                 </>
               )}
