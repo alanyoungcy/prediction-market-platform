@@ -104,7 +104,7 @@ export default function ProfilePage() {
               
               {positions.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">You don't have any positions yet.</p>
+                  <p className="text-gray-500 mb-4">You don&apos;t have any positions yet.</p>
                   <Link 
                     href="/markets" 
                     className="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition"

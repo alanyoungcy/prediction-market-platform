@@ -20,8 +20,6 @@ export const createMarketTransaction = (
 };
 
 export const buySharesTransaction = (
-  marketId: string,
-  outcome: boolean,
   amount: string
 ) => {
   return {
@@ -36,11 +34,7 @@ export const buySharesTransaction = (
   };
 };
 
-export const sellSharesTransaction = (
-  marketId: string,
-  outcome: boolean,
-  amount: string
-) => {
+export const sellSharesTransaction = () => {
   return {
     validUntil: Math.floor(Date.now() / 1000) + 60, // 60 seconds
     messages: [
@@ -53,10 +47,7 @@ export const sellSharesTransaction = (
   };
 };
 
-export const resolveMarketTransaction = (
-  marketId: string,
-  outcome: boolean
-) => {
+export const resolveMarketTransaction = () => {
   return {
     validUntil: Math.floor(Date.now() / 1000) + 60, // 60 seconds
     messages: [

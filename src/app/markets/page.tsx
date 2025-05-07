@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Header from '../components/Header';
-import { ArrowUpDown, Filter, Search } from 'lucide-react';
+import { Filter, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useMarkets } from '../contexts/MarketContext';
 

@@ -104,7 +104,7 @@ type MarketContextType = {
   buyShares: (marketId: string, outcome: boolean, amount: number) => void;
   sellShares: (marketId: string, outcome: boolean, amount: number) => void;
   resolveMarket: (marketId: string, outcome: boolean) => void;
-  getUserPositions: (address: string) => Position[];
+  getUserPositions: () => Position[];
   loading: boolean;
 };
 
@@ -270,7 +270,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     );
   };
   
-  const getUserPositions = (address: string) => {
+  const getUserPositions = () => {
     return positions;
   };
   
