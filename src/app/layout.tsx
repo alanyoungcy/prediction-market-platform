@@ -1,7 +1,9 @@
 'use client';
 
+import React from 'react';
 import { Geist, Geist_Mono } from "next/font/google";
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
+import { MarketProvider } from './contexts/MarketContext';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,7 +27,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TonConnectUIProvider manifestUrl="/tonconnect-manifest.json">
-          {children}
+          <MarketProvider>
+            {children}
+          </MarketProvider>
         </TonConnectUIProvider>
       </body>
     </html>
